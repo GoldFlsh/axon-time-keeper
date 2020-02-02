@@ -31,7 +31,7 @@ public class TimeCard {
 
   @CommandHandler
   public TimeCard(ClockInCommand cmd) {
-    apply(new ClockInEvent(cmd.getEmployeeName(),
+    apply(new ClockedInEvent(cmd.getEmployeeName(),
         GenericEventMessage.clock.instant(),
         cmd.getTimeCardEntryId()));
   }
@@ -41,14 +41,14 @@ public class TimeCard {
     getEntryIfOpen(cmd.getTimeCardEntryId()).
         ifPresentOrElse(
             entry -> apply(
-                new ClockOutEvent(cmd.getEmployeeName(),
+                new ClockedOutEvent(cmd.getEmployeeName(),
                     GenericEventMessage.clock.instant(),
                     entry.timeCardEntryId)),
             () -> log.error("Employee has not clocked in or is already clocked out"));
   }
 
   @EventSourcingHandler
-  public void on(ClockInEvent event) {
+  public void on(ClockedInEvent event) {
     this.employeeName = event.getEmployeeName();
     timeCardEntries.add(new TimeCardEntry(event.getTimeCardEntryId(), event.getTime()));
   }
@@ -69,7 +69,7 @@ public class TimeCard {
     private Instant clockOutTime;
 
     @EventSourcingHandler
-    public void on(ClockOutEvent event) {
+    public void on(ClockedOutEvent event) {
       this.clockOutTime = event.getTime();
     }
 

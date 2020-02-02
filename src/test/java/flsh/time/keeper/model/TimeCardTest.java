@@ -23,7 +23,7 @@ class TimeCardTest {
     String timeCardEntryUuid = UUID.randomUUID().toString();
     testFixture.givenNoPriorActivity()
         .when(new ClockInCommand(employeeName, timeCardEntryUuid))
-        .expectEvents(new ClockInEvent(employeeName, testFixture.currentTime(), timeCardEntryUuid));
+        .expectEvents(new ClockedInEvent(employeeName, testFixture.currentTime(), timeCardEntryUuid));
   }
 
   @ParameterizedTest
@@ -33,7 +33,7 @@ class TimeCardTest {
     testFixture
         .givenCommands(new ClockInCommand(employeeName, timeCardEntryUuid))
         .when(new ClockOutCommand(employeeName, timeCardEntryUuid))
-        .expectEvents(new ClockOutEvent(employeeName, testFixture.currentTime(), timeCardEntryUuid));
+        .expectEvents(new ClockedOutEvent(employeeName, testFixture.currentTime(), timeCardEntryUuid));
   }
 
   private static Stream<String> randomEmployeeName() {
