@@ -1,4 +1,4 @@
-package flsh.time.keeper.axontimekeeper
+package flsh.time.keeper
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

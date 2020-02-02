@@ -1,4 +1,4 @@
-package flsh.time.keeper.axontimekeeper
+package flsh.time.keeper
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
