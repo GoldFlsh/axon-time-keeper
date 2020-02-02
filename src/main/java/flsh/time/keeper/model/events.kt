@@ -4,4 +4,10 @@ import java.time.Instant
 
 data class ClockInEvent(
         val employeeName: String,
-        val clockInTime: Instant)
+        val time: Instant,
+        val timeCardEntryId: String)
+
+data class ClockOutEvent(
+        val employeeName: String,
+        val time: Instant,
+        val timeCardEntryId: String)
