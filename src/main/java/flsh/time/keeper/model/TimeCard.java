@@ -25,8 +25,8 @@ public class TimeCard {
   @AggregateMember(eventForwardingMode = ForwardMatchingInstances.class)
   private List<TimeCardEntry> timeCardEntries = new ArrayList<>();
 
-  public TimeCard() {
-    log.debug("empty constructor invoked");
+  private TimeCard() {
+    //Empty Constructor for Axon framework
   }
 
   @CommandHandler
@@ -44,7 +44,7 @@ public class TimeCard {
                 new ClockOutEvent(cmd.getEmployeeName(),
                     GenericEventMessage.clock.instant(),
                     entry.timeCardEntryId)),
-            () -> log.error("Employee has not clocked in"));
+            () -> log.error("Employee has not clocked in or is already clocked out"));
   }
 
   @EventSourcingHandler
