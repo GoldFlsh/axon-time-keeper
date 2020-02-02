@@ -20,20 +20,20 @@ class TimeCardTest {
   @ParameterizedTest
   @MethodSource(value = "randomEmployeeName")
   void testClockInCommand(String employeeName) {
-    String randomUUID = UUID.randomUUID().toString();
+    String timeCardEntryUuid = UUID.randomUUID().toString();
     testFixture.givenNoPriorActivity()
-        .when(new ClockInCommand(employeeName, randomUUID))
-        .expectEvents(new ClockInEvent(employeeName, testFixture.currentTime(), randomUUID));
+        .when(new ClockInCommand(employeeName, timeCardEntryUuid))
+        .expectEvents(new ClockInEvent(employeeName, testFixture.currentTime(), timeCardEntryUuid));
   }
 
   @ParameterizedTest
   @MethodSource(value = "randomEmployeeName")
   void testClockOutCommand(String employeeName) {
-    String randomUUID = UUID.randomUUID().toString();
+    String timeCardEntryUuid = UUID.randomUUID().toString();
     testFixture
-        .givenCommands(new ClockInCommand(employeeName, randomUUID))
-        .when(new ClockOutCommand(employeeName, randomUUID))
-        .expectEvents(new ClockOutEvent(employeeName, testFixture.currentTime(), randomUUID));
+        .givenCommands(new ClockInCommand(employeeName, timeCardEntryUuid))
+        .when(new ClockOutCommand(employeeName, timeCardEntryUuid))
+        .expectEvents(new ClockOutEvent(employeeName, testFixture.currentTime(), timeCardEntryUuid));
   }
 
   private static Stream<String> randomEmployeeName() {
