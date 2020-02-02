@@ -56,27 +56,27 @@ class TimeCardTest {
     testFixture.
         givenCommands(new OnboardNewEmployeeCommand(employeeName),
             new ClockInCommand(employeeName, timeCardEntryUuid))
-        .andGivenCurrentTime(addDays(8))
+        .andGivenCurrentTime(addHours(8))
         .andGivenCommands(new ClockOutCommand(employeeName, timeCardEntryUuid))
         .when(new UpdateTimeCardEntryCommand(
             employeeName, timeCardEntryUuid,
-            subtractDays(9),
-            subtractDays(1)))
+            subtractHours(9),
+            subtractHours(1)))
         .expectEvents(new TimeCardUpdatedEvent(employeeName,
             timeCardEntryUuid,
-            subtractDays(9),
-            subtractDays(1)));
+            subtractHours(9),
+            subtractHours(1)));
   }
 
-  private Instant addDays(Integer days) {
-    return testFixture.currentTime().plus(Duration.ofHours(days));
+  private Instant addHours(Integer hours) {
+    return testFixture.currentTime().plus(Duration.ofHours(hours));
   }
 
-  private Instant subtractDays(Integer days) {
-    return testFixture.currentTime().minus(Duration.ofHours(days));
+  private Instant subtractHours(Integer hours) {
+    return testFixture.currentTime().minus(Duration.ofHours(hours));
   }
 
   private static Stream<String> randomEmployeeName() {
-    return Stream.generate(RandomString::make).limit(10);
+    return Stream.generate(RandomString::make).limit(1);
   }
 }

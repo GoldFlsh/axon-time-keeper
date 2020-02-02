@@ -64,7 +64,6 @@ public class TimeCard {
 
   @EventSourcingHandler
   public void on(ClockedInEvent event) {
-    this.employeeName = event.getEmployeeName();
     timeCardEntries.add(new TimeCardEntry(event.getTimeCardEntryId(), event.getTime()));
   }
 
