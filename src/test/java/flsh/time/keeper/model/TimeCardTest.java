@@ -53,27 +53,27 @@ class TimeCardTest {
   @MethodSource(value = "randomEmployeeName")
   void testUpdateTimeEntryCommand(String employeeName) {
     String timeCardEntryUuid = UUID.randomUUID().toString();
-    testFixture.
-        givenCommands(new OnboardNewEmployeeCommand(employeeName),
+    final Instant shiftStart = Instant.now();
+    final Instant shiftEnd = shiftStart.plus(Duration.ofHours(8));
+
+    final Instant shiftStartAdjusted = shiftStart.plus(Duration.ofHours(1));
+    final Instant shiftEndAdjusted = shiftEnd.plus(Duration.ofHours(2));
+
+    testFixture.givenCurrentTime(shiftStart)
+        .andGivenCommands(new OnboardNewEmployeeCommand(employeeName),
             new ClockInCommand(employeeName, timeCardEntryUuid))
-        .andGivenCurrentTime(addHours(8))
+        .andGivenCurrentTime(shiftEnd) //progress time forward 8 hours
         .andGivenCommands(new ClockOutCommand(employeeName, timeCardEntryUuid))
+
         .when(new UpdateTimeCardEntryCommand(
             employeeName, timeCardEntryUuid,
-            subtractHours(9),
-            subtractHours(1)))
-        .expectEvents(new TimeCardUpdatedEvent(employeeName,
-            timeCardEntryUuid,
-            subtractHours(9),
-            subtractHours(1)));
-  }
+            shiftStartAdjusted,
+            shiftEndAdjusted))
 
-  private Instant addHours(Integer hours) {
-    return testFixture.currentTime().plus(Duration.ofHours(hours));
-  }
-
-  private Instant subtractHours(Integer hours) {
-    return testFixture.currentTime().minus(Duration.ofHours(hours));
+        .expectEvents(new TimeCardUpdatedEvent(
+            employeeName, timeCardEntryUuid,
+            shiftStartAdjusted,
+            shiftEndAdjusted));
   }
 
   private static Stream<String> randomEmployeeName() {
