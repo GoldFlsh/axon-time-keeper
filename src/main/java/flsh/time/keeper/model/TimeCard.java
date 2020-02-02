@@ -1,22 +1,27 @@
 package flsh.time.keeper.model;
 
+import static org.axonframework.modelling.command.AggregateLifecycle.apply;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventhandling.GenericEventMessage;
 import org.axonframework.eventsourcing.EventSourcingHandler;
-import org.axonframework.modelling.command.*;
+import org.axonframework.modelling.command.AggregateIdentifier;
+import org.axonframework.modelling.command.AggregateLifecycle;
+import org.axonframework.modelling.command.AggregateMember;
+import org.axonframework.modelling.command.EntityId;
+import org.axonframework.modelling.command.ForwardMatchingInstances;
 import org.axonframework.spring.stereotype.Aggregate;
-
-import static org.axonframework.modelling.command.AggregateLifecycle.*;
 
 @Slf4j
 @Aggregate
+@SuppressWarnings("unused")
 public class TimeCard {
 
   @AggregateIdentifier
@@ -30,7 +35,12 @@ public class TimeCard {
   }
 
   @CommandHandler
-  public TimeCard(ClockInCommand cmd) {
+  public TimeCard(OnboardNewEmployeeCommand cmd) {
+    AggregateLifecycle.apply(new EmployeeOnboardedEvent(cmd.getEmployeeName()));
+  }
+
+  @CommandHandler
+  public void handle(ClockInCommand cmd) {
     apply(new ClockedInEvent(cmd.getEmployeeName(),
         GenericEventMessage.clock.instant(),
         cmd.getTimeCardEntryId()));
@@ -43,8 +53,13 @@ public class TimeCard {
             entry -> apply(
                 new ClockedOutEvent(cmd.getEmployeeName(),
                     GenericEventMessage.clock.instant(),
-                    entry.timeCardEntryId)),
+                    entry.getTimeCardEntryId())),
             () -> log.error("Employee has not clocked in or is already clocked out"));
+  }
+
+  @EventSourcingHandler
+  public void on(EmployeeOnboardedEvent event) {
+    this.employeeName = event.getEmployeeName();
   }
 
   @EventSourcingHandler
@@ -60,17 +75,37 @@ public class TimeCard {
         .findFirst();
   }
 
+  @Getter
   @Data
   public class TimeCardEntry {
 
     @EntityId
     private final String timeCardEntryId;
-    private final Instant clockInTime;
+    private Instant clockInTime;
     private Instant clockOutTime;
+
+    public TimeCardEntry(String timeCardEntryId, Instant clockInTime) {
+      this.timeCardEntryId = timeCardEntryId;
+      this.clockInTime = clockInTime;
+    }
+
+    @CommandHandler
+    public void handle(UpdateTimeCardEntryCommand cmd) {
+      if (cmd.getTimeCardEntryId().equals(timeCardEntryId)) {
+        apply(new TimeCardUpdatedEvent(cmd.getEmployeeName(), cmd.getTimeCardEntryId(),
+            cmd.getStartTime(), cmd.getEndTime()));
+      }
+    }
 
     @EventSourcingHandler
     public void on(ClockedOutEvent event) {
       this.clockOutTime = event.getTime();
+    }
+
+    @EventSourcingHandler
+    public void on(TimeCardUpdatedEvent event) {
+      this.clockInTime = event.getStartTime();
+      this.clockOutTime = event.getEndTime();
     }
 
     private boolean isClockedIn() {
