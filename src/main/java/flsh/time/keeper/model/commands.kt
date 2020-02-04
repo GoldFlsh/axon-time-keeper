@@ -11,7 +11,7 @@ data class ClockInCommand(@TargetAggregateIdentifier val employeeName: String,
 data class ClockOutCommand(@TargetAggregateIdentifier val employeeName: String,
                            val timeCardEntryId: String)
 
-data class UpdateTimeCardEntryCommand(
+data class FixTimeCardEntryCommand(
         @TargetAggregateIdentifier val employeeName: String,
         val timeCardEntryId: String,
         val startTime: Instant,

@@ -15,7 +15,7 @@ data class ClockedOutEvent(
         val time: Instant,
         val timeCardEntryId: String)
 
-data class TimeCardUpdatedEvent(
+data class TimeCardEntryFixedEvent(
         val employeeName: String,
         val timeCardEntryId: String,
         val startTime: Instant,

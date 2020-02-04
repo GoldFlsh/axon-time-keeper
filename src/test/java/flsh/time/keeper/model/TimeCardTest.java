@@ -51,7 +51,7 @@ class TimeCardTest {
 
   @ParameterizedTest
   @MethodSource(value = "randomEmployeeName")
-  void testUpdateTimeEntryCommand(String employeeName) {
+  void testFixTimeCardEntryCommand(String employeeName) {
     String timeCardEntryUuid = UUID.randomUUID().toString();
     final Instant shiftStart = Instant.now();
     final Instant shiftEnd = shiftStart.plus(Duration.ofHours(8));
@@ -65,12 +65,12 @@ class TimeCardTest {
         .andGivenCurrentTime(shiftEnd) //progress time forward 8 hours
         .andGivenCommands(new ClockOutCommand(employeeName, timeCardEntryUuid))
 
-        .when(new UpdateTimeCardEntryCommand(
+        .when(new FixTimeCardEntryCommand(
             employeeName, timeCardEntryUuid,
             shiftStartAdjusted,
             shiftEndAdjusted))
 
-        .expectEvents(new TimeCardUpdatedEvent(
+        .expectEvents(new TimeCardEntryFixedEvent(
             employeeName, timeCardEntryUuid,
             shiftStartAdjusted,
             shiftEndAdjusted));

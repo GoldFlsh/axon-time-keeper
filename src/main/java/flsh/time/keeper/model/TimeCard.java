@@ -89,9 +89,9 @@ public class TimeCard {
     }
 
     @CommandHandler
-    public void handle(UpdateTimeCardEntryCommand cmd) {
+    public void handle(FixTimeCardEntryCommand cmd) {
       if (cmd.getTimeCardEntryId().equals(timeCardEntryId)) {
-        apply(new TimeCardUpdatedEvent(cmd.getEmployeeName(), cmd.getTimeCardEntryId(),
+        apply(new TimeCardEntryFixedEvent(cmd.getEmployeeName(), cmd.getTimeCardEntryId(),
             cmd.getStartTime(), cmd.getEndTime()));
       }
     }
@@ -102,7 +102,7 @@ public class TimeCard {
     }
 
     @EventSourcingHandler
-    public void on(TimeCardUpdatedEvent event) {
+    public void on(TimeCardEntryFixedEvent event) {
       this.clockInTime = event.getStartTime();
       this.clockOutTime = event.getEndTime();
     }
